@@ -2,6 +2,10 @@
   "name": "jar-explorer",
   "displayName": "Jar Explorer",
   "description": "This used to view the class file content in vs code",
+  "repository": {
+  "type": "git",
+  "url": "https://github.com/en-rypted/jar-explorer.git"
+  },
   "publisher": "Shiv",
   "author": {
     "name": "Shiv",
