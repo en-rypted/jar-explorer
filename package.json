@@ -2,32 +2,75 @@
   "name": "jar-explorer",
   "displayName": "Jar Explorer",
   "description": "This used to view the class file content in vs code",
+  "publisher": "Shiv",
+  "author": {
+    "name": "Shiv",
+    "email": "shivwakchaure19@gmail.com",
+    "url": ""
+  },
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.102.0"
+    "vscode": "^1.70.0"
   },
+   "icon": "media/icon.svg",
   "categories": [
     "Other"
   ],
   "activationEvents": [],
   "main": "./extension.js",
-  "contributes": {
-    "commands": [{
-      "command": "jar-explorer.helloWorld",
-      "title": "Hello World"
-    }]
-  },
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.102.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
-    "eslint": "^9.25.1",
+    "@types/vscode": "^1.102.0",
     "@vscode/test-cli": "^0.0.11",
-    "@vscode/test-electron": "^2.5.2"
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.25.1"
+  },
+  "contributes": {
+  "views": {
+    "explorer": [
+      {
+        "id": "jarExplorerView",
+        "name": "JAR Explorer"
+      }
+    ]
+  },
+  "customEditors": [
+    {
+      "viewType": "jarExplorer.editor",
+      "displayName": "JAR Explorer",
+      "selector": [
+        {
+          "filenamePattern": "*.jar"
+        }
+      ]
+    }
+  ],
+  "configuration": {
+    "properties": {
+      "jarExplorer.jdkPath": {
+        "type": "string",
+        "default": "java",
+        "description": "Path to your Java executable"
+      }
+    }
+  },
+  "viewsContainers": {
+  "activitybar": [
+    {
+      "id": "jarExplorer",
+      "title": "JAR Explorer",
+      "icon": "media/icon.svg"
+    }
+  ]
+}
+},
+  "dependencies": {
+    "adm-zip": "^0.5.16"
   }
 }
