@@ -12,7 +12,7 @@
   "engines": {
     "vscode": "^1.102.0"
   },
-   "icon": "media/icon.svg",
+   "icon": "media/icon.png",
   "categories": [
     "Other"
   ],
@@ -65,7 +65,7 @@
     {
       "id": "jarExplorer",
       "title": "JAR Explorer",
-      "icon": "media/icon.svg"
+      "icon": "media/icon.png"
     }
   ]
 }
