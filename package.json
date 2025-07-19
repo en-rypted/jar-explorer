@@ -9,10 +9,9 @@
   "publisher": "shivwakchaure",
   "author": {
     "name": "Shiv",
-    "email": "shivwakchaure19@gmail.com",
-    "url": ""
+    "email": "shivwakchaure19@gmail.com"
   },
-  "version": "0.0.1",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.102.0"
   },

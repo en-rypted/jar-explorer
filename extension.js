@@ -2,35 +2,48 @@
 const vscode = require("vscode");
 const cp = require("child_process");
 const fs = require("fs");
-const {execFile}= require("child_process");
+const { execFile } = require("child_process");
 const path = require("path");
 const tmp = require("os").tmpdir();
 const AdmZip = require("adm-zip");
 
 class ClassNode extends vscode.TreeItem {
-  constructor(label, fullPath, collapsibleState, jarRoot,classPath) {
+  constructor(label, fullPath, collapsibleState, jarRoot, classPath) {
     super(label, collapsibleState);
     this.fullPath = fullPath;
     this.children = [];
-	this.classPath = classPath;
+    this.classPath = classPath;
 
-    this.id = fullPath;
+    this.id = label + "::" + fullPath + classPath;
     this.resourceUri = vscode.Uri.file(fullPath);
-    this.contextValue = collapsibleState === vscode.TreeItemCollapsibleState.None ? "classFile" : "folder";
+    this.contextValue =
+      collapsibleState === vscode.TreeItemCollapsibleState.None
+        ? "classFile"
+        : "folder";
 
     if (collapsibleState === vscode.TreeItemCollapsibleState.None) {
       this.command = {
         command: "jarExplorer.openClassFile",
         title: "Open Class File",
-        arguments: [jarRoot,classPath,label]
+        arguments: [jarRoot, classPath, label],
       };
     }
+  }
+
+  getId() {
+    return this.id;
   }
 }
 
 function buildTreeFromPaths(jarPath, classPaths) {
   const jarLabel = path.basename(jarPath);
-  const rootNode = new ClassNode(jarLabel, "/", vscode.TreeItemCollapsibleState.Expanded, true);
+  const rootNode = new ClassNode(
+    jarLabel,
+    "/",
+    vscode.TreeItemCollapsibleState.Expanded,
+    jarPath,
+    "/"
+  );
 
   for (const classPath of classPaths) {
     const parts = classPath.split("/");
@@ -39,16 +52,23 @@ function buildTreeFromPaths(jarPath, classPaths) {
 
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
-	  if(part == ''){
-		continue;
-	  }
+      if (part == "") {
+        continue;
+      }
       currentPath = path.join(currentPath, part);
-      let existing = current.children.find(c => c.label === part);
+      let existing = current.children.find((c) => c.label === part);
 
       if (!existing) {
         const isLeaf = i === parts.length - 1;
-        existing = new ClassNode(part, currentPath,
-          isLeaf ? vscode.TreeItemCollapsibleState.None : vscode.TreeItemCollapsibleState.Collapsed,jarPath,classPath);
+        existing = new ClassNode(
+          part,
+          currentPath,
+          isLeaf
+            ? vscode.TreeItemCollapsibleState.None
+            : vscode.TreeItemCollapsibleState.Collapsed,
+          jarPath,
+          classPath
+        );
         current.children.push(existing);
       }
 
@@ -56,7 +76,7 @@ function buildTreeFromPaths(jarPath, classPaths) {
     }
   }
 
-  return [rootNode]; // Return a single top-level node (the JAR file)
+  return rootNode; // Return a single top-level node (the JAR file)
 }
 
 class JarTreeDataProvider {
@@ -68,18 +88,61 @@ class JarTreeDataProvider {
   }
 
   setJarFile(jarPath) {
-    const javaPath = vscode.workspace.getConfiguration().get("jarExplorer.jdkPath", "java");
-    const jarTool = path.join(this.context.extensionPath, "resources", "JarExplorerService.jar");
+    const javaPath =
+      vscode.workspace.getConfiguration("jarExplorer").get("jdkPath") || "java";
+    const jarTool = path.join(
+      this.context.extensionPath,
+      "resources",
+      "JarExplorerService.jar"
+    );
 
-    execFile(javaPath, ["-jar", jarTool,"JarView" ,jarPath], (err, stdout) => {
+    execFile(javaPath, ["-jar", jarTool, "JarView", jarPath], (err, stdout) => {
       if (err) {
-        vscode.window.showErrorMessage("Failed to run JarExplorer: " + err.message);
+        vscode.window.showErrorMessage(
+          "Failed to run JarExplorer: " + err.message
+        );
+        if (
+          err.message.includes("java.lang.UnsupportedClassVersionError") ||
+          err.message.includes("ENOENT")
+        ) {
+          const message =
+            "JDK 21 is required. Please install or set the path to JDK 21.";
+          const button = "Download JDK 21";
+          const jdkPathButton = "Set JDK Path in Settings";
+          vscode.window
+            .showInformationMessage(message, button, jdkPathButton)
+            .then((selection) => {
+              if (selection === button) {
+                vscode.env.openExternal(
+                  vscode.Uri.parse(
+                    "https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html"
+                  )
+                );
+              } else if (selection === jdkPathButton) {
+                vscode.commands.executeCommand(
+                  "workbench.action.openSettingsJson"
+                );
+                vscode.window.showInformationMessage(`In settings.json, add:
+"java.home": "/path/to/your/jdk21"`);
+              }
+            });
+        }
         return;
       }
       try {
         const list = JSON.parse(stdout); // expects list of class paths
-        const flatPaths = list.map(e => e.name); // ["com/example/MyClass.class"]
-        this.tree = buildTreeFromPaths(jarPath,flatPaths);
+        const flatPaths = list.map((e) => e.name); // ["com/example/MyClass.class"]
+        let newNode = buildTreeFromPaths(jarPath, flatPaths);
+        let arr = this.tree.filter((e) => {
+          return e.getId() == newNode.getId();
+        });
+        if (arr.length > 0) {
+          vscode.window.showInformationMessage(
+            "This Jar : " + jarPath + " Already added in Jar Explorer.😊"
+          );
+          return;
+        }
+        this.tree = [...this.tree, newNode];
         this._onDidChangeTreeData.fire();
       } catch (e) {
         vscode.window.showErrorMessage("Invalid JSON output from tool.");
@@ -96,129 +159,125 @@ class JarTreeDataProvider {
   }
 }
 
-
-
-
-function runJarTool(jarPath, entryPath,context) {
-  const jarTool = path.join(context.extensionPath, "resources", "JarExplorerService.jar");
-  const jdkPath = vscode.workspace.getConfiguration("jarExplorer").get("jdkPath") || "java";
-  const jarCfrTool = path.join(context.extensionPath, "resources", "cfr-0.152.jar");
+function runJarTool(jarPath, entryPath, context) {
+  const jarTool = path.join(
+    context.extensionPath,
+    "resources",
+    "JarExplorerService.jar"
+  );
+  const jdkPath =
+    vscode.workspace.getConfiguration("jarExplorer").get("jdkPath") || "java";
+  const jarCfrTool = path.join(
+    context.extensionPath,
+    "resources",
+    "cfr-0.152.jar"
+  );
 
   return new Promise((resolve, reject) => {
     const cmd = cp.spawn(jdkPath, [
       "-jar",
       jarTool,
-	  "classDecompile",
+      "classDecompile",
       jarPath,
-	    jdkPath,
+      jdkPath,
       entryPath,
-	  jarCfrTool
+      jarCfrTool,
     ]);
 
     let output = "";
     let error = "";
 
-    cmd.stdout.on("data", data => (output += data.toString()));
-    cmd.stderr.on("data", data => (error += data.toString()));
+    cmd.stdout.on(
+      "data",
+      (data) => (output += data.toString().replace(/[\r\n]+/g, ""))
+    );
+    cmd.stderr.on("data", (data) => (error += data.toString()));
 
-    cmd.on("close", code => {
+    cmd.on("close", (code) => {
       if (code === 0) resolve(output);
       else reject(new Error(error || `Tool failed with exit code ${code}`));
     });
   });
 }
 
-function getWebviewContent(title, code ,loading = false) {
-	 const loadingHtml = `
-    <div id="loader" style="text-align:center; padding-top:50px;">
-      <svg width="40" height="40" viewBox="0 0 40 40" stroke="#ccc">
-        <g fill="none" fill-rule="evenodd">
-          <g transform="translate(2 2)" stroke-width="3">
-            <circle stroke-opacity=".5" cx="18" cy="18" r="18"/>
-            <path d="M36 18c0-9.94-8.06-18-18-18">
-              <animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="1s" repeatCount="indefinite"/>
-            </path>
-          </g>
-        </g>
-      </svg>
-      <p>Decompiling class...</p>
-    </div>`;
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-       <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.css" rel="stylesheet" />
-      <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-java.min.js"></script>
-      <style>
-        body {
-          font-family: monospace;
-          padding: 1rem;
-          background-color: #1e1e1e;
-          color: #d4d4d4;
-        }
-        pre {
-          white-space: pre-wrap;
-        }
-        code {
-          font-size: 14px;
-        }
-      </style>
-    </head>
-    <body>
-         ${loading ? loadingHtml : ` <pre><code class="language-java">${code}</code></pre>`}
-     
-    </body>
-    </html>
-  `;
+
+function decodeBase64Url(base64Url) {
+  let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+
+  while (base64 % 4) {
+    base64 += "=";
+  }
+  return atob(base64);
 }
 
 function activate(context) {
   const treeProvider = new JarTreeDataProvider(context);
   vscode.window.registerTreeDataProvider("jarExplorerView", treeProvider);
 
+  const provier = new (class {
+    provideTextDocumentContent(uri) {
+      return decodeBase64Url(uri.query);
+    }
+  })();
+  const regs = vscode.workspace.registerTextDocumentContentProvider(
+    "virtual",
+    provier
+  );
   vscode.window.registerCustomEditorProvider(
-	"jarExplorer.editor",
-	{
-		async openCustomDocument(uri){
-			return {uri,dispose:()=>{}}
-		},
-		async resolveCustomEditor(document,webviewPanel,_token){
-			treeProvider.setJarFile(document.uri.fsPath);
-			setTimeout(() => {
-				if(!webviewPanel.disposed){
-					webviewPanel.dispose();
-				}
-			}, 100);
-		}
-		
-	},
-	{supportsMultipleEditorsPerDocument:false}
-  )
+    "jarExplorer.editor",
+    {
+      async openCustomDocument(uri) {
+        return { uri, dispose: () => {} };
+      },
+      async resolveCustomEditor(document, webviewPanel, _token) {
+        treeProvider.setJarFile(document.uri.fsPath);
+        setTimeout(() => {
+          if (!webviewPanel.disposed) {
+            webviewPanel.dispose();
+          }
+        }, 100);
+      },
+    },
+    { supportsMultipleEditorsPerDocument: false }
+  );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("jarExplorer.openClassFile", async (jarPath, entryPath,className) => {
-      const panel = vscode.window.createWebviewPanel("jarExplorerView", className, vscode.ViewColumn.One, {
-        enableScripts: true
-      });
-	  panel.webview.html = getWebviewContent(className, "",true);
+    vscode.commands.registerCommand(
+      "jarExplorer.openClassFile",
+      async (jarPath, entryPath, className) => {
+        
+        try {
+          const result = await runJarTool(jarPath, entryPath, context);
 
-      try {
-        const result = await runJarTool(jarPath, entryPath,context);
-		const escaped = result
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-            
-	   panel.webview.html = getWebviewContent(className, escaped);
-      } catch (err) {
-        panel.webview.html = `<h3>Error</h3><pre>${err.message}</pre>`;
+          const uri = vscode.Uri.parse(`virtual:/${className}?${result}`);
+
+          await openWithLoader(uri,className);
+        } catch (err) {
+        
+          vscode.window.showErrorMessage(
+            "Something went wrong : " + err.message
+          );
+        }
       }
-    })
+    )
   );
 }
 
+async function openWithLoader(uri,className) {
+    await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification, // or .Window or .SourceControl
+        title: `Opening file ${className}...🥳`,
+        cancellable: false
+    }, async (progress) => {
+        progress.report({ increment: 0 });
 
+        // Simulate loading or await your real async action
+        await vscode.commands.executeCommand("vscode.open", uri);
+
+        progress.report({ increment: 100 });
+    });
+
+  }
 
 exports.activate = activate;
 

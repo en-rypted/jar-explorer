@@ -1,6 +1,7 @@
 # 🧩 JAR Explorer
 
-A Visual Studio Code extension to **explore and decompile `.jar` files**. Browse contents in a tree view, view `.class` files, and render Java source using a custom decompiler tool like CFR—all inside VS Code.
+**A Visual Studio Code extension to explore and decompile `.jar` files.**  
+Browse contents in a tree view, view `.class` files and other resources, and render Java source using a custom decompiler tool like [CFR](https://www.benf.org/other/cfr)—all inside VS Code.
 
 ![JAR Explorer Demo](media/how_use.gif)
 
@@ -8,13 +9,14 @@ A Visual Studio Code extension to **explore and decompile `.jar` files**. Browse
 
 ## ✨ Features
 
-- 📁 Tree view of JAR file structure
-- 🧬 View `.class` files with syntax highlighting
-- 🧪 Uses your custom JAR-based decompiler (e.g. CFR)
-- ⚙️ Configurable paths for JAR and JDK
-- ⏳ Shows loading state while decompiling
-- 🚫 Optionally supports cancel/decompile timeout
-- 🧹 Clean and modern webview interface
+- 📁 **Tree view** of JAR file structure  
+- 🧬 View `.class` files with **syntax highlighting**  
+- 🧪 Integrates with your custom JAR-based decompiler (e.g. [CFR](https://www.benf.org/other/cfr))  
+- ⚙️ Configurable paths for both **JAR** and **JDK**  
+- ⏳ Displays **loading state** while decompiling  
+- 🚫 Supports **cancellation** or automatic **decompile timeout**  
+- 🧹 Clean and **modern WebView interface**  
+- 📂 Handles **multiple JAR files** simultaneously  
 
 ---
 
@@ -27,7 +29,6 @@ A Visual Studio Code extension to **explore and decompile `.jar` files**. Browse
 ## ⚙️ Requirements
 
 - **Java JDK 21** installed or added to PATH
-- Optionally set the default JAR path in settings
 
 ---
 
@@ -48,3 +49,20 @@ You can add these in your `settings.json`:
 ```
 
 ![JAR Explorer Demo](media/how_change_jdk_path.gif)
+
+## 📝 Release Notes
+
+### Version 0.0.1 
+
+- Initial beta release with support for viewing `.class` files.
+
+### Version 1.0.0
+
+- Added support for viewing files other than `.class` files within the `.jar`.
+- Improved file opening behavior and view handling.
+- Multiple `.jar` files can now be opened simultaneously in the Jar Explorer tab.
+- This is stable release.
+
+## 💳 Creadits
+
+We have used the CFR Decompiler (https://www.benf.org/other/cfr) to reverse engineer .class files. CFR was chosen for its accuracy, support for modern Java features, and ease of integration into Java-based tooling workflows.
