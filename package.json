@@ -3,19 +3,19 @@
   "displayName": "Jar Explorer",
   "description": "This used to view the class file content in vs code",
   "repository": {
-  "type": "git",
-  "url": "https://github.com/en-rypted/jar-explorer.git"
+    "type": "git",
+    "url": "https://github.com/en-rypted/jar-explorer.git"
   },
   "publisher": "shivwakchaure",
   "author": {
     "name": "Shiv",
     "email": "shivwakchaure19@gmail.com"
   },
-  "version": "1.0.0",
+  "version": "1.1.0",
   "engines": {
     "vscode": "^1.102.0"
   },
-   "icon": "media/icon.png",
+  "icon": "media/icon.png",
   "categories": [
     "Other"
   ],
@@ -35,45 +35,81 @@
     "eslint": "^9.25.1"
   },
   "contributes": {
-  "views": {
-    "explorer": [
-      {
-        "id": "jarExplorerView",
-        "name": "JAR Explorer"
-      }
-    ]
-  },
-  "customEditors": [
-    {
-      "viewType": "jarExplorer.editor",
-      "displayName": "JAR Explorer",
-      "selector": [
+    "views": {
+      "jarExplorer": [
         {
-          "filenamePattern": "*.jar"
+          "id": "jarExplorerView",
+          "name": "JAR Explorer",
+          "icon": "media/icon.png"
+        }
+      ]
+    },
+    "customEditors": [
+      {
+        "viewType": "jarExplorer.editor",
+        "displayName": "JAR Explorer",
+        "selector": [
+          {
+            "filenamePattern": "*.jar"
+          },
+          {
+            "filenamePattern": "*.zip"
+          },
+          {
+            "filenamePattern": "*.war"
+          },
+          {
+            "filenamePattern": "*.ear"
+          },
+          {
+            "filenamePattern": "*.vsix"
+          }
+        ]
+      }
+    ],
+    "configuration": {
+      "properties": {
+        "jarExplorer.jdkPath": {
+          "type": "string",
+          "default": "java",
+          "description": "Path to your Java executable"
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "jarExplorer",
+          "title": "JAR Explorer",
+          "icon": "media/icon_nav.png"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "jarExplorer.openWithCustomEditor",
+        "title": "🧩 Open in JAR Explorer"
+      },
+      {
+        "command": "jarExplorer.removeFile",
+        "title": "🗑️ Remove Folder"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "jarExplorer.openWithCustomEditor",
+          "when": "resourceExtname == .jar || resourceExtname == .zip || resourceExtname == .war || resourceExtname == .ear || resourceExtname == .vsix",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "jarExplorer.removeFile",
+          "when": "view == jarExplorerView && viewItem == jarRoot",
+          "group": "navigation"
         }
       ]
     }
-  ],
-  "configuration": {
-    "properties": {
-      "jarExplorer.jdkPath": {
-        "type": "string",
-        "default": "java",
-        "description": "Path to your Java executable"
-      }
-    }
-  },
-  "viewsContainers": {
-  "activitybar": [
-    {
-      "id": "jarExplorer",
-      "title": "JAR Explorer",
-      "icon": "media/icon.png"
-    }
-  ]
-}
-},
-  "dependencies": {
-    "adm-zip": "^0.5.16"
   }
 }
