@@ -11,7 +11,7 @@
     "name": "Shiv",
     "email": "shivwakchaure19@gmail.com"
   },
-  "version": "1.1.0",
+  "version": "1.2.0",
   "engines": {
     "vscode": "^1.102.0"
   },
@@ -41,6 +41,11 @@
           "id": "jarExplorerView",
           "name": "JAR Explorer",
           "icon": "media/icon.png"
+        },
+        {
+          "id": "jarExplorerSearch",
+          "name": "Search Results",
+          "icon": "$(search)"
         }
       ]
     },
@@ -93,6 +98,26 @@
       {
         "command": "jarExplorer.removeFile",
         "title": "🗑️ Remove Folder"
+      },
+      {
+        "command": "jarExplorer.searchJar",
+        "title": "Locate File",
+        "icon": "$(search)"
+      },
+      {
+        "command": "jarExplorer.deepSearchJar",
+        "title": "Search Code",
+        "icon": "$(telescope)"
+      },
+      {
+        "command": "jarExplorer.openExternalJar",
+        "title": "Open JAR",
+        "icon": "$(add)"
+      },
+      {
+        "command": "jarExplorer.clearSearch",
+        "title": "Clear Search Results",
+        "icon": "$(clear-all)"
       }
     ],
     "menus": {
@@ -105,11 +130,43 @@
       ],
       "view/item/context": [
         {
+          "command": "jarExplorer.searchJar",
+          "when": "view == jarExplorerView && viewItem == jarRoot",
+          "group": "inline"
+        },
+        {
+          "command": "jarExplorer.deepSearchJar",
+          "when": "view == jarExplorerView && viewItem == jarRoot",
+          "group": "inline"
+        },
+        {
           "command": "jarExplorer.removeFile",
           "when": "view == jarExplorerView && viewItem == jarRoot",
           "group": "navigation"
         }
+      ],
+      "view/title": [
+        {
+          "command": "jarExplorer.openExternalJar",
+          "when": "view == jarExplorerView",
+          "group": "navigation"
+        },
+        {
+          "command": "jarExplorer.clearSearch",
+          "when": "view == jarExplorerSearch",
+          "group": "navigation"
+        }
       ]
-    }
+    },
+    "viewsWelcome": [
+      {
+        "view": "jarExplorerView",
+        "contents": "No JAR files are currently open.\n[Open JAR](command:jarExplorer.openExternalJar)"
+      },
+      {
+        "view": "jarExplorerSearch",
+        "contents": "No search results to display.\n\nTo search the contents of a JAR, hover over an open JAR in the Explorer and click the Telescope icon, or click below.\n[Search Code](command:jarExplorer.deepSearchJar)"
+      }
+    ]
   }
 }

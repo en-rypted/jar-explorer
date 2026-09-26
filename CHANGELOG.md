@@ -4,6 +4,22 @@ All notable changes to this project will be documented here.
 
 ---
 
+## [1.2.0] – 2026-09-26
+
+### 🔍 Search Enhancements
+- 🔭 **Deep Search (Search Code):** Search for strings and regex directly inside all decompiled classes and files within a JAR.
+- ⚡ **Lightning Fast Backend:** Uses Java native binary scanning to instantly locate matches before decompiling.
+- 🎨 **Native UI Integration:** Search results are beautifully displayed in a dedicated tree view with syntax highlighting, native file icons, and match badges.
+- ⚙️ **Advanced Search Toggles:** Supports **Match Case** (`Aa`), **Match Whole Word** (`ab`), and **Regular Expression** (`.*`) matching!
+- 🖱️ **One-Click Navigation:** Clicking a search result seamlessly decompiles the class and navigates you straight to the matched line number.
+- 🎯 **Smart JAR Selection:** Intuitive dropdown prompt to select which JAR to search when multiple archives are open.
+- 🧹 Added a **Clear Search Results** button.
+
+### 🐛 Bug Fixes
+- 🍎 Fixed an issue where `.exe` was incorrectly appended to the Java executable path on macOS and Linux systems.
+
+---
+
 ## [1.1.0] – 2025-07-25
 
 ### 🆕 Archive Support Enhancements

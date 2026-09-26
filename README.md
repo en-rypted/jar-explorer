@@ -40,6 +40,9 @@ Effortlessly browse Java archives, view their internal structure (including **ne
 
 - 📁 **Tree view** of `.jar`, `.war`,`.ear`,`.zip` and `.vsix` file structures  
 - 🧬 View `.class` files with **syntax highlighting and decompiled Java source**  
+- 🔭 **Deep Search (Search Code):** Search for text/regex inside all decompiled classes across the JAR simultaneously!
+- ⚡ **Lightning Fast Scanning:** Uses native binary scanning for instant results.
+- ⚙️ **Advanced Search Options:** Supports Match Case (`Aa`), Match Whole Word (`ab`), and Regular Expressions (`.*`).
 - 🧪 Integrates with your custom JAR-based decompiler (e.g. [CFR](https://www.benf.org/other/cfr))  
 - ⚙️ Configurable paths for **Decompiler JAR** and **JDK**  
 - ⏳ Displays **loading state** while decompiling large files  
@@ -103,7 +106,24 @@ Follow these steps to explore and decompile `.jar`, `.war`,`.ear`,`.zip` and `.v
 
 ---
 
-### 6️⃣ Need Help?
+### 6️⃣ Search Inside JARs (Deep Search)
+
+- Hover over an opened JAR in the Jar Explorer panel.
+- Click the **🔭 Telescope (Search Code)** icon, or the **🔍 Magnifying Glass (Locate File)** icon.
+- Alternatively, type your search query and toggle rules (Regex, Match Case, Match Whole Word).
+- Matches will intuitively appear in the new **Search Results** panel! Click any match to open the decompiled file immediately.
+
+---
+
+### 7️⃣ Remove an Archive
+
+- Hover over the root archive node
+- Click the **❌ Remove Folder** icon
+- The archive will close and the decompiled cache is cleared.
+
+---
+
+### 8️⃣ Need Help?
 
 - If you're stuck, feel free to **ask a question** in the [**Marketplace Q&A section**](https://marketplace.visualstudio.com/items?itemName=shivwakchaure.jar-explorer&ssr=false#qna)
 - Feedback and suggestions are always welcome!
@@ -147,6 +167,18 @@ You can add these in your `settings.json`:
 ![JAR Explorer Demo](https://raw.githubusercontent.com/en-rypted/jar-explorer/dev/media/how_change_jdk_path.gif)
 
 ## 📝 Release Notes
+
+### 📦 v1.2.0
+
+- 🔭 **Deep Search Code:** Added a blazing fast backend binary scanner to instantly search for text or regex across all decompiled classes inside a JAR.
+- 🎨 **Native UI Integration:** Search results are meticulously designed with native file icons, line numbers, and text highlighting directly in the Tree View!
+- ⚙️ **Advanced Matching:** Added native-style toggles for **Match Case**, **Match Whole Word**, and **Regular Expressions**.
+- 🖱️ **Instant Navigation:** Clicking a search result instantly navigates you to the exact matched line of code.
+- 🎯 **Smart Search Prompts:** Added a dropdown to intelligently pick which JAR to search when multiple archives are open.
+- 🧹 Added a **Clear Search Results** action.
+- 🍎 Fixed an issue causing improper Java executable paths (`.exe`) on macOS and Linux systems.
+
+---
 
 ### 📦 v1.1.0
 
