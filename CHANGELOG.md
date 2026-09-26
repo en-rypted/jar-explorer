@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented here.
 
+## [1.2.1] – 2026-09-26
+
+### 🐛 Hotfix
+- ☕ Compiled backend to target **Java 11** for vastly increased runtime compatibility (`UnsupportedClassVersionError` fix).
+
 ---
 
 ## [1.2.0] – 2026-09-26

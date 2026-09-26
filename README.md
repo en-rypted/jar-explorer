@@ -168,6 +168,12 @@ You can add these in your `settings.json`:
 
 ## 📝 Release Notes
 
+### 📦 v1.2.1
+
+- ☕ **Hotfix:** Recompiled the Java backend server to target **Java 11**, solving the `UnsupportedClassVersionError` for users running older JVMs (Java 11 - Java 24).
+
+---
+
 ### 📦 v1.2.0
 
 - 🔭 **Deep Search Code:** Added a blazing fast backend binary scanner to instantly search for text or regex across all decompiled classes inside a JAR.
